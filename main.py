@@ -63,19 +63,30 @@ def generate_ai_content(topic):
     if not model:
         return f"AI model not configured. Placeholder post for {topic}."
 
-    prompt = f"""You are a creative social media marketing assistant for a landscaping and outdoor design company. Your goal is to generate an engaging and lead-generating social media post for Facebook and Twitter. The post should be concise, interesting, and encourage potential customers to inquire about services.
+    prompt = f"""
+You are a creative social media marketing assistant for a landscaping and outdoor design company.
+Your goal is to generate ONE concise, engaging, and lead-generating social media post for Facebook (max 500 characters).
+The post should:
+- Be interesting and encourage potential customers to inquire about services.
+- Use relevant emojis to make it appealing.
+- Only output a single message/no multiple options.
+- include  trending hashtags.
+- no not include call to action to visit website or chat on whatsapp.
 
-    Topic: "{topic}"
 
-    Generate a short, engaging social media post (max 200 characters for Twitter, max 500 for Facebook). Include a clear call to action to learn more or get a free quote. Use relevant emojis to make it appealing.
-    """
+Topic: "{topic}"
+"""
     try:
         # Make the API call to Gemini
         response = model.generate_content(prompt)
-        
+        print("API Response:", response)  # Debugging line to see the full response structure
         # Extract the text from the API response
         if response.candidates and response.candidates[0].content.parts:
-            return response.candidates[0].content.parts[0].text
+            single_post = response.candidates[0].content.parts[0].text.strip()
+            # Final fallback: ensure non-empty message
+            if not single_post:
+                single_post = "Contact us for expert landscaping and outdoor services! [visit our website](https://ecogreencontractors.solutions/) or [chat with us on whatsapp](https://wa.me/254746887291?text=Hello%21%20I%27m%20interested%20in%20landscaping%20and%20outdoor%20services)"
+            return single_post
         else:
             print(f"Error: Gemini API response structure unexpected or empty content for topic '{topic}'.")
             return f"Failed to generate AI content for {topic}."
@@ -140,40 +151,8 @@ def post_to_facebook(message):
         return False
 
 def post_to_twitter(message):
-    """
-    Minimal working example for posting to Twitter using OAuth1Session and Twitter API v2.
-    """
-    print(f"Attempting to post to Twitter (X): {message[:70]}...")
-    url = "https://api.twitter.com/2/tweets"
-    payload = {"text": message}
-    try:
-        from requests_oauthlib import OAuth1Session
-        oauth = OAuth1Session(
-            TWITTER_API_KEY,
-            client_secret=TWITTER_API_SECRET,
-            resource_owner_key=TWITTER_ACCESS_TOKEN,
-            resource_owner_secret=TWITTER_ACCESS_TOKEN_SECRET,
-        )
-        response = oauth.post(url, json=payload, timeout=10)
-        print("Status code:", response.status_code)
-        print("Response:", response.text)
-        if response.status_code == 201 or response.status_code == 200:
-            try:
-                response_json = response.json()
-                tweet_id = response_json.get("data", {}).get("id")
-                if tweet_id:
-                    print(f"Successfully posted to Twitter! Tweet ID: {tweet_id}")
-                else:
-                    print(f"Successfully posted to Twitter! Response: {response_json}")
-            except Exception:
-                print(f"Successfully posted to Twitter! Response: {response.text}")
-            return True
-        else:
-            print(f"Twitter post failed. Status: {response.status_code}, Response: {response.text}")
-            return False
-    except Exception as e:
-        print(f"Error posting to Twitter: {e}")
-        return False
+    # Twitter posting functionality has been removed.
+    pass
 
 def send_social_media_post():
     """
@@ -194,18 +173,12 @@ def send_social_media_post():
     facebook_success = post_to_facebook(post_content)
     print(f"Facebook post success: {facebook_success}")
 
-    # 4. Send the post to Twitter
-    twitter_success = post_to_twitter(post_content)
-
-    # 5. Log the overall outcome
-    if facebook_success and twitter_success:
-        print("Post successfully sent to both Facebook and Twitter!")
-    elif facebook_success:
-        print("Post successfully sent to Facebook, but Twitter failed or was skipped.")
-    elif twitter_success:
-        print("Post successfully sent to Twitter, but Facebook failed or was skipped.")
+    # Twitter posting functionality has been removed.
+    # Log only Facebook outcome
+    if facebook_success:
+        print("Post successfully sent to Facebook!")
     else:
-        print("Failed to send post to both Facebook and Twitter.")
+        print("Failed to send post to Facebook.")
     print("--- End of post cycle ---")
 
 # --- Scheduling ---
@@ -228,7 +201,7 @@ def schedule_posts():
     schedule.every().day.at("08:00").do(send_social_media_post)
     schedule.every().day.at("12:00").do(send_social_media_post)
     schedule.every().day.at("16:00").do(send_social_media_post)
-    schedule.every().day.at("01:40").do(send_social_media_post)
+    schedule.every().day.at("03:28").do(send_social_media_post)
     schedule.every().day.at("00:00").do(send_social_media_post) # Next day's first post
 
     print("Scheduler started. The script will run continuously and execute tasks at scheduled times.")
