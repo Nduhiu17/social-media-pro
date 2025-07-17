@@ -201,7 +201,7 @@ def schedule_posts():
     schedule.every().day.at("08:00").do(send_social_media_post)
     schedule.every().day.at("12:00").do(send_social_media_post)
     schedule.every().day.at("16:00").do(send_social_media_post)
-    schedule.every().day.at("03:34").do(send_social_media_post)
+    schedule.every().day.at("09:56").do(send_social_media_post)
     schedule.every().day.at("00:00").do(send_social_media_post) # Next day's first post
 
     print("Scheduler started. The script will run continuously and execute tasks at scheduled times.")
