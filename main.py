@@ -71,7 +71,7 @@ The post should:
 - Use relevant emojis to make it appealing.
 - Only output a single message/no multiple options.
 - include  trending hashtags.
-- no not include call to action to visit website or chat on whatsapp.
+- no call to action to visit website or chat on whatsapp.don't include call to action to visit website or chat on whatsapp.
 
 
 Topic: "{topic}"
@@ -201,7 +201,7 @@ def schedule_posts():
     schedule.every().day.at("08:00").do(send_social_media_post)
     schedule.every().day.at("12:00").do(send_social_media_post)
     schedule.every().day.at("16:00").do(send_social_media_post)
-    schedule.every().day.at("03:28").do(send_social_media_post)
+    schedule.every().day.at("03:34").do(send_social_media_post)
     schedule.every().day.at("00:00").do(send_social_media_post) # Next day's first post
 
     print("Scheduler started. The script will run continuously and execute tasks at scheduled times.")
