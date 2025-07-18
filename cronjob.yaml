@@ -3,8 +3,8 @@ kind: CronJob
 metadata:
   name: social-media-post
 spec:
-  # Runs at 05:00, 07:00, 12:15, 13:00, 16:00, 21:00 every day (6 times per day)
-  schedule: "0 5,7,13,16,21 * * *\n15 12 * * *"
+  # Runs at 05:00, 07:00, 13:00, 16:00, 21:00 every day (5 times per day)
+  schedule: "0 5,7,13,16,21 * * *"
   jobTemplate:
     spec:
       template:
@@ -12,6 +12,7 @@ spec:
           containers:
           - name: social-media-pro
             image: nduhiu254/social-media-pro:latest
+            imagePullPolicy: Always
             envFrom:
             - secretRef:
                 name: social-media-env  # Store your .env as a Kubernetes Secret
