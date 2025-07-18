@@ -55,16 +55,17 @@ def append_hashtags_to_message(message, hashtags):
     """
     Appends a list of hashtags to the message, separated by spaces.
     """
+    hashtags_string = ""
     if hashtags:
-        for hashtag in hashtags:
-            message += f" {hashtag.strip()}"
-    return message
-
+        hashtags_string = " ".join(hashtags) if isinstance(hashtags, list) else hashtags
+    final_message = message + " " + hashtags_string.strip()
+    print(f"Final message with hashtags>>>>>>>>>>>>>>>>>>>>>>>: {final_message}")
+    return final_message
 
 def generate_twitter_ai_content(topic):
     """
     Generates engaging social media post content for Twitter using the Gemini AI model.
-    The prompt is designed to create concise, engaging, and hashtag-rich tweets (max 280 characters).
+    The prompt is designed to create concise, engaging, and hashtag-rich tweets (max 180 characters).
     """
     if not model:
         return f"AI model not configured. Placeholder tweet for {topic}."
@@ -133,6 +134,7 @@ TOPICS = [
     "Indoor plants and Indoor Planting",
     "Eco-Friendly Outdoor Solutions",
     "Custom Outdoor Lighting Solutions",
+    "Request to be followed back on social media for more updates and offers",
 ]
 
 # Initialize Gemini API
@@ -245,6 +247,7 @@ def post_to_twitter(message):
     """
     Posts a message to Twitter using the Twitter API v2 and OAuth1Session.
     """
+    print("posting to twitter", message)
     print(f"Attempting to post to Twitter (X): {message[:70]}...")
     url = "https://api.twitter.com/2/tweets"
     payload = {"text": message}
