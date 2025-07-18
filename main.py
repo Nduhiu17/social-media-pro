@@ -5,7 +5,7 @@ import time
 import requests
 import google.generativeai as genai
 from dotenv import load_dotenv
-import schedule
+ # schedule module no longer needed
 from requests_oauthlib import OAuth1Session
 
 def generate_twitter_ai_content(topic):
@@ -253,42 +253,6 @@ def send_social_media_post():
         print("Failed to send post to Twitter.")
     print("--- End of post cycle ---")
 
-# --- Scheduling ---
-
-def schedule_posts():
-    """
-    Schedules the social media posts to run 5 times per day.
-    This uses the 'schedule' library for demonstration purposes.
-    For a production environment, a more robust solution like:
-    - Linux Cron jobs
-    - AWS Lambda with EventBridge
-    - Google Cloud Scheduler with Cloud Functions/Run
-    - A dedicated task queue (e.g., Celery with Redis/RabbitMQ)
-    would be recommended, as this script needs to run continuously.
-    """
-    print("Scheduling social media posts to run 5 times per day...")
-    
-    # To run 5 times per day, each run should be approximately every 4.8 hours (24 / 5).
-    # We'll set specific times for clarity and consistency.
-    schedule.every().day.at("06:56").do(send_social_media_post)
-    schedule.every().day.at("12:00").do(send_social_media_post)
-    schedule.every().day.at("16:00").do(send_social_media_post)
-    schedule.every().day.at("09:56").do(send_social_media_post)
-    schedule.every().day.at("00:00").do(send_social_media_post) # Next day's first post
-
-    print("Scheduler started. The script will run continuously and execute tasks at scheduled times.")
-    print("Press Ctrl+C to stop the scheduler.")
-    while True:
-        schedule.run_pending()
-        time.sleep(1) # Wait one second before checking for pending jobs again
-
 # --- Main Execution Block ---
 if __name__ == "__main__":
-    # You can uncomment the line below to run a single post immediately for testing purposes.
-    # This is useful to quickly check if AI generation and API calls (even simulated ones) work.
-    # send_social_media_post()
-
-    # To start the automated daily posting, uncomment the line below.
-    # Remember that this script needs to be running continuously in the background
-    # for the scheduler to work.
-    schedule_posts()
+    send_social_media_post()
