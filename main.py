@@ -7,6 +7,59 @@ import google.generativeai as genai
 from dotenv import load_dotenv
  # schedule module no longer needed
 from requests_oauthlib import OAuth1Session
+import requests
+from bs4 import BeautifulSoup
+import time # To add delays and avoid being blocked
+
+
+def get_kenya_trends():
+    url = "https://trends24.in/kenya/"
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    } # Mimic a web browser
+
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status() # Raise an HTTPError for bad responses (4xx or 5xx)
+
+        soup = BeautifulSoup(response.text, 'html.parser')
+
+        # --- IMPORTANT: You need to inspect the trends24.in/kenya/ HTML to find the correct selectors ---
+        # Look for the HTML structure that contains the trending topics.
+        # This is a placeholder example based on common patterns:
+        trending_list_container = soup.find('div', class_='list-container') # Or whatever the actual class/id is
+        
+        if trending_list_container:
+            trends = trending_list_container.find_all('li') # Assuming each trend is an <li> item
+            
+            kenya_trends = []
+            for trend_item in trends:
+                hashtag_element = trend_item.find('a') # Assuming the hashtag is in an <a> tag
+
+                if hashtag_element:
+                    hashtag = hashtag_element.get_text(strip=True)
+                    kenya_trends.append(hashtag)
+            return kenya_trends[:10]  # Return top 10 trends
+        else:
+            print("Could not find the trending list container on the page.")
+            return []
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching page: {e}")
+        return []
+    except Exception as e:
+        print(f"An error occurred during parsing: {e}")
+        return []
+
+def append_hashtags_to_message(message, hashtags):
+    """
+    Appends a list of hashtags to the message, separated by spaces.
+    """
+    if hashtags:
+        for hashtag in hashtags:
+            message += f" {hashtag.strip()}"
+    return message
+
 
 def generate_twitter_ai_content(topic):
     """
@@ -21,9 +74,10 @@ You are a creative social media marketing assistant for a landscaping and outdoo
 Your goal is to generate ONE concise, engaging, and lead-generating social media post for Twitter (max 280 characters).
 The post should:
 - Be interesting and encourage potential customers to inquire about services.
-- Use relevant emojis and trending hashtags to make it appealing.
+- Dont include hashtags, we shall add them later.
+- Use relevant emojis to make it appealing.
 - Only output a single message/no multiple options.
-- add call to action to visit website ecogreencontractors.solutions and chat on whatsapp +254746887291.
+- add call to action to visit website https://ecogreencontractors.solutions and enquire on whatsapp +254746887291.
 
 Topic: "{topic}"
 """
@@ -73,7 +127,12 @@ TOPICS = [
     "Professional Tree Care & Maintenance",
     "Durable Walkway & Road Construction",
     "Precise Excavation & Cabro Laying",
-    "Stunning Water Features & Pools"
+    "Stunning Water Features & Pools",
+    "Plants & Flowers",
+    "Plants that thrive in Kenya's northern eastern region",
+    "Indoor plants and Indoor Planting",
+    "Eco-Friendly Outdoor Solutions",
+    "Custom Outdoor Lighting Solutions",
 ]
 
 # Initialize Gemini API
@@ -103,7 +162,7 @@ The post should:
 - Use relevant emojis to make it appealing.
 - Only output a single message/no multiple options.
 - include  trending hashtags.
-- add call to action to visit website ecogreencontractors.solutions and chat on whatsapp to number +254746887291.
+- add call to action to visit website https://ecogreencontractors.solutions/ and chat on whatsapp to number +254746887291.
 
 
 Topic: "{topic}"
@@ -228,25 +287,30 @@ def send_social_media_post():
     selected_facebook_topic = random.choice(TOPICS)
     print(f"Selected topic: {selected_facebook_topic}")
 
-    # 2. Generate AI content for the post
-    post_content = generate_facebook_ai_content(selected_facebook_topic)
-    print(f"Generated Post Content:\n{post_content}")
+    # 2. Fetch trending hashtags in Kenya
+    trending_hashtags = get_kenya_trends()
+    print(f"Trending hashtags in Kenya: {trending_hashtags}")
 
-    # 3. Send the post to Facebook
+    # 3. Generate AI content for Facebook
+    post_content = generate_facebook_ai_content(selected_facebook_topic)
+
+    # 4. Send the post to Facebook
     facebook_success = post_to_facebook(post_content)
     print(f"Facebook post success: {facebook_success}")
 
-    # Twitter posting functionality has been removed.
-    # Log only Facebook outcome
     if facebook_success:
         print("Post successfully sent to Facebook!")
     else:
         print("Failed to send post to Facebook.")
+
+    # 5. Generate AI content for Twitter and append hashtags
     selected_twitter_topic = random.choice(TOPICS)
     print(f"Selected topic for Twitter: {selected_twitter_topic}")
     twitter_post_content = generate_twitter_ai_content(selected_twitter_topic)
-    print(f"Generated Twitter Post Content:\n{twitter_post_content}")
-    twitter_success = post_to_twitter(twitter_post_content)
+    # Append hashtags to the Twitter post content
+    twitter_post_content_with_hashtags = append_hashtags_to_message(twitter_post_content, trending_hashtags)
+    print(f"Generated Twitter Post Content with hashtags:\n{twitter_post_content_with_hashtags}")
+    twitter_success = post_to_twitter(twitter_post_content_with_hashtags)
     if twitter_success:
         print("Post successfully sent to Twitter!")
     else:
