@@ -8,9 +8,41 @@ from dotenv import load_dotenv
 import schedule
 from requests_oauthlib import OAuth1Session
 
-# Load environment variables from .env file
-# This allows you to keep sensitive API keys out of your code and in a separate .env file.
-load_dotenv()
+def generate_twitter_ai_content(topic):
+    """
+    Generates engaging social media post content for Twitter using the Gemini AI model.
+    The prompt is designed to create concise, engaging, and hashtag-rich tweets (max 280 characters).
+    """
+    if not model:
+        return f"AI model not configured. Placeholder tweet for {topic}."
+
+    prompt = f"""
+You are a creative social media marketing assistant for a landscaping and outdoor design company.
+Your goal is to generate ONE concise, engaging, and lead-generating social media post for Twitter (max 280 characters).
+The post should:
+- Be interesting and encourage potential customers to inquire about services.
+- Use relevant emojis and trending hashtags to make it appealing.
+- Only output a single message/no multiple options.
+- Do NOT include call to action to visit website or chat on whatsapp.
+
+Topic: "{topic}"
+"""
+    try:
+        response = model.generate_content(prompt)
+        print("Twitter API Response:", response)
+        if response.candidates and response.candidates[0].content.parts:
+            single_tweet = response.candidates[0].content.parts[0].text.strip()
+            if not single_tweet:
+                single_tweet = "Contact us for expert landscaping and outdoor services!"
+            return single_tweet
+        else:
+            print(f"Error: Gemini API response structure unexpected or empty content for topic '{topic}'.")
+            return f"Failed to generate AI content for {topic}."
+    except Exception as e:
+        print(f"Error generating AI content for topic '{topic}': {e}")
+        return f"Failed to generate AI content for {topic}."
+
+
 
 # --- Configuration ---
 # Gemini API Key: Get this from Google AI Studio or Google Cloud Console.
@@ -55,7 +87,7 @@ else:
 
 # --- Helper Functions ---
 
-def generate_ai_content(topic):
+def generate_facebook_ai_content(topic):
     """
     Generates engaging social media post content using the Gemini AI model.
     The prompt is designed to create lead-generating and engaging messages.
@@ -151,8 +183,39 @@ def post_to_facebook(message):
         return False
 
 def post_to_twitter(message):
-    # Twitter posting functionality has been removed.
-    pass
+    """
+    Posts a message to Twitter using the Twitter API v2 and OAuth1Session.
+    """
+    print(f"Attempting to post to Twitter (X): {message[:70]}...")
+    url = "https://api.twitter.com/2/tweets"
+    payload = {"text": message}
+    try:
+        oauth = OAuth1Session(
+            TWITTER_API_KEY,
+            client_secret=TWITTER_API_SECRET,
+            resource_owner_key=TWITTER_ACCESS_TOKEN,
+            resource_owner_secret=TWITTER_ACCESS_TOKEN_SECRET,
+        )
+        response = oauth.post(url, json=payload, timeout=10)
+        print("Status code:", response.status_code)
+        print("Response:", response.text)
+        if response.status_code == 201 or response.status_code == 200:
+            try:
+                response_json = response.json()
+                tweet_id = response_json.get("data", {}).get("id")
+                if tweet_id:
+                    print(f"Successfully posted to Twitter! Tweet ID: {tweet_id}")
+                else:
+                    print(f"Successfully posted to Twitter! Response: {response_json}")
+            except Exception:
+                print(f"Successfully posted to Twitter! Response: {response.text}")
+            return True
+        else:
+            print(f"Twitter post failed. Status: {response.status_code}, Response: {response.text}")
+            return False
+    except Exception as e:
+        print(f"Error posting to Twitter: {e}")
+        return False
 
 def send_social_media_post():
     """
@@ -162,11 +225,11 @@ def send_social_media_post():
     print(f"\n--- Starting new social media post cycle at {time.ctime()} ---")
     
     # 1. Randomly select a topic
-    selected_topic = random.choice(TOPICS)
-    print(f"Selected topic: {selected_topic}")
+    selected_facebook_topic = random.choice(TOPICS)
+    print(f"Selected topic: {selected_facebook_topic}")
 
     # 2. Generate AI content for the post
-    post_content = generate_ai_content(selected_topic)
+    post_content = generate_facebook_ai_content(selected_facebook_topic)
     print(f"Generated Post Content:\n{post_content}")
 
     # 3. Send the post to Facebook
@@ -179,6 +242,15 @@ def send_social_media_post():
         print("Post successfully sent to Facebook!")
     else:
         print("Failed to send post to Facebook.")
+    selected_twitter_topic = random.choice(TOPICS)
+    print(f"Selected topic for Twitter: {selected_twitter_topic}")
+    twitter_post_content = generate_twitter_ai_content(selected_twitter_topic)
+    print(f"Generated Twitter Post Content:\n{twitter_post_content}")
+    twitter_success = post_to_twitter(twitter_post_content)
+    if twitter_success:
+        print("Post successfully sent to Twitter!")
+    else:
+        print("Failed to send post to Twitter.")
     print("--- End of post cycle ---")
 
 # --- Scheduling ---
@@ -198,7 +270,7 @@ def schedule_posts():
     
     # To run 5 times per day, each run should be approximately every 4.8 hours (24 / 5).
     # We'll set specific times for clarity and consistency.
-    schedule.every().day.at("08:00").do(send_social_media_post)
+    schedule.every().day.at("06:56").do(send_social_media_post)
     schedule.every().day.at("12:00").do(send_social_media_post)
     schedule.every().day.at("16:00").do(send_social_media_post)
     schedule.every().day.at("09:56").do(send_social_media_post)
