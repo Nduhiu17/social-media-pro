@@ -21,3 +21,4 @@ ENV PYTHONUNBUFFERED=1
 
 # Entrypoint
 CMD ["python", "main.py"]
+# Runs at 05:00, 07:00, 13:00, 16:00, 21:00 every day (5 times per day)

@@ -23,7 +23,7 @@ The post should:
 - Be interesting and encourage potential customers to inquire about services.
 - Use relevant emojis and trending hashtags to make it appealing.
 - Only output a single message/no multiple options.
-- Do NOT include call to action to visit website or chat on whatsapp.
+- add call to action to visit website ecogreencontractors.solutions and chat on whatsapp +254746887291.
 
 Topic: "{topic}"
 """
@@ -103,7 +103,7 @@ The post should:
 - Use relevant emojis to make it appealing.
 - Only output a single message/no multiple options.
 - include  trending hashtags.
-- no call to action to visit website or chat on whatsapp.don't include call to action to visit website or chat on whatsapp.
+- add call to action to visit website ecogreencontractors.solutions and chat on whatsapp to number +254746887291.
 
 
 Topic: "{topic}"
