@@ -78,6 +78,7 @@ The post should:
 - Dont include hashtags, we shall add them later.
 - Use relevant emojis to make it appealing.
 - Only output a single message/no multiple options.
+- Format the content well with proper spacing and line breaks.
 - add call to action to visit website https://ecogreencontractors.solutions and enquire on whatsapp +254746887291.
 
 Topic: "{topic}"
@@ -135,6 +136,36 @@ TOPICS = [
     "Eco-Friendly Outdoor Solutions",
     "Custom Outdoor Lighting Solutions",
     "Request to be followed back on social media for more updates and offers",
+    "Unveiling Your Vision: The Landscape Design Process Explained",
+    "Modern vs. Traditional: Choosing Your Outdoor Aesthetic",
+    "The Art of Outdoor Zoning: Creating Functional 'Rooms' in Your Garden",
+    "Small Yard, Big Dreams: Maximizing Compact Outdoor Spaces",
+    "Designing for Privacy: Hedges, Screens & Walls for Your Sanctuary",
+    "Curb Appeal Secrets: Boosting Your Home's First Impression",
+    "Patio Perfection: Choosing Materials & Layouts for Outdoor Living",
+    "Walkways & Paths: Guiding Guests with Style and Function",
+    "Retaining Walls: Blending Functionality with Aesthetic Appeal",
+    "Fire Pits & Outdoor Fireplaces: Igniting Cozy Evenings",
+    "The Soothing Sounds: Incorporating Water Features into Your Design",
+    "Custom Deck Designs: Extending Your Indoor Living Space Outdoors",
+    "Drought-Tolerant Landscaping: Beautiful & Water-Wise Solutions for Kenya",
+    "Native Plants for Kenya: Attracting Wildlife & Thriving Gardens",
+    "Edible Landscapes: Growing Your Own Food in Style",
+    "Color Theory in the Garden: Painting with Plants for Visual Impact",
+    "Smart Irrigation: Saving Water, Keeping Your Landscape Lush",
+    "Choosing the Right Trees: Shade, Privacy & Long-Term Beauty",
+    "Flower Power: Creating Continuous Blooms in Your Garden",
+    "Vertical Gardens: Green Walls for Urban & Small Spaces",
+    "Outdoor Kitchen Essentials: From Grilling Stations to Gourmet Setups",
+    "Poolside Paradise: Landscaping to Enhance Your Aquatic Retreat",
+    "Backyard Putting Greens: Practice Your Putt at Home",
+    "Illuminate Your Landscape: Evening Ambiance & Safety Lighting",
+    "Creating an Outdoor Entertainment Hub: Design Tips",
+    "Year-Round Garden Care: A Seasonal Guide for Kenya",
+    "Solving Drainage Dilemmas: Managing Water in Your Yard",
+    "Landscaping on a Budget: Smart Choices for Maximum Impact",
+    "The ROI of Landscaping: How Outdoor Upgrades Pay Off",
+    "Beyond Aesthetics: The Health & Wellness Benefits of Outdoor Spaces"
 ]
 
 # Initialize Gemini API
@@ -158,10 +189,13 @@ def generate_facebook_ai_content(topic):
 
     prompt = f"""
 You are a creative social media marketing assistant for a landscaping and outdoor design company.
-Your goal is to generate ONE concise, engaging, and lead-generating social media post for Facebook (max 500 characters).
+Your goal is to generate ONE concise, engaging, and lead-generating social media post for Facebook (max 700 characters).
 The post should:
 - Be interesting and encourage potential customers to inquire about services.
 - Use relevant emojis to make it appealing.
+- The content should be engaging and lead to inquiries.
+- Content length does not matter though it should be concise and clear.
+- Format the content well with proper spacing and line breaks.
 - Only output a single message/no multiple options.
 - include  trending hashtags.
 - add call to action to visit website https://ecogreencontractors.solutions/ and chat on whatsapp to number +254746887291.
