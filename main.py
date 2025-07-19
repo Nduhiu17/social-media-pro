@@ -39,7 +39,7 @@ def get_kenya_trends():
                 if hashtag_element:
                     hashtag = hashtag_element.get_text(strip=True)
                     kenya_trends.append(hashtag)
-            return kenya_trends[:10]  # Return top 10 trends
+            return kenya_trends[:4]  # Return top 4 trends
         else:
             print("Could not find the trending list container on the page.")
             return []
@@ -72,7 +72,7 @@ def generate_twitter_ai_content(topic):
 
     prompt = f"""
 You are a creative social media marketing assistant for a landscaping and outdoor design company.
-Your goal is to generate ONE concise, engaging, and lead-generating social media post for Twitter (max 280 characters).
+Your goal is to generate ONE concise, engaging, and lead-generating social media post for Twitter (max 200 characters).
 The post should:
 - Be interesting and encourage potential customers to inquire about services.
 - Dont include hashtags, we shall add them later.
@@ -248,7 +248,8 @@ def post_to_twitter(message):
     Posts a message to Twitter using the Twitter API v2 and OAuth1Session.
     """
     print("posting to twitter", message)
-    print(f"Attempting to post to Twitter (X): {message[:70]}...")
+    print(f"Attempting to post to Twitter (X): {message}")
+    print("posting to twitter a message with length", len(message))
     url = "https://api.twitter.com/2/tweets"
     payload = {"text": message}
     try:
