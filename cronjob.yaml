@@ -11,7 +11,7 @@ spec:
         spec:
           containers:
           - name: social-media-pro
-            image: nduhiu254/social-media-pro:v1.0.4
+            image: nduhiu254/social-media-pro:v1.0.6
             imagePullPolicy: Always
             envFrom:
             - secretRef:

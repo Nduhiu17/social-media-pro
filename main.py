@@ -39,7 +39,7 @@ def get_kenya_trends():
                 if hashtag_element:
                     hashtag = hashtag_element.get_text(strip=True)
                     kenya_trends.append(hashtag)
-            return kenya_trends[:4]  # Return top 4 trends
+            return kenya_trends[:6]  # Return top 4 trends
         else:
             print("Could not find the trending list container on the page.")
             return []
@@ -59,7 +59,6 @@ def append_hashtags_to_message(message, hashtags):
     if hashtags:
         hashtags_string = " ".join(hashtags) if isinstance(hashtags, list) else hashtags
     final_message = message + " " + hashtags_string.strip()
-    print(f"Final message with hashtags>>>>>>>>>>>>>>>>>>>>>>>: {final_message}")
     return final_message
 
 def generate_twitter_ai_content(topic):
@@ -72,7 +71,7 @@ def generate_twitter_ai_content(topic):
 
     prompt = f"""
 You are a creative social media marketing assistant for a landscaping and outdoor design company.
-Your goal is to generate ONE concise, engaging, and lead-generating social media post for Twitter (max 200 characters).
+Your goal is to generate ONE concise, engaging, and lead-generating social media post for Twitter (max 215 characters).
 The post should:
 - Be interesting and encourage potential customers to inquire about services.
 - Dont include hashtags, we shall add them later.
@@ -124,6 +123,7 @@ TWITTER_ACCESS_TOKEN_SECRET = os.getenv("TWITTER_ACCESS_TOKEN_SECRET", "YOUR_TWI
 
 # Predefined topics for social media post generation
 TOPICS = [
+    "Emphasize the importance of the user liking and following our facebook page https://www.facebook.com/profile.php?id=61578337620398. And following us on Twitter https://x.com/9Ecogreen"
     "Expert Landscaping and Design",
     "Dedicated Garden Maintenance",
     "Professional Tree Care & Maintenance",
@@ -188,17 +188,17 @@ def generate_facebook_ai_content(topic):
         return f"AI model not configured. Placeholder post for {topic}."
 
     prompt = f"""
-You are a creative social media marketing assistant for a landscaping and outdoor design company.
-Your goal is to generate ONE concise, engaging, and lead-generating social media post for Facebook (max 700 characters).
-The post should:
-- Be interesting and encourage potential customers to inquire about services.
-- Use relevant emojis to make it appealing.
-- The content should be engaging and lead to inquiries.
-- Content length does not matter though it should be concise and clear.
-- Format the content well with proper spacing and line breaks.
-- Only output a single message/no multiple options.
-- include  trending hashtags.
-- add call to action to visit website https://ecogreencontractors.solutions/ and chat on whatsapp to number +254746887291.
+        You are a creative social media marketing assistant for a landscaping and outdoor design company.
+        Your goal is to generate ONE concise, engaging, and lead-generating social media post for Facebook (max 700 characters).
+        The post should:
+        - Be interesting and encourage potential customers to inquire about services.
+        - Use relevant emojis to make it appealing.
+        - The content should be engaging and lead to inquiries.
+        - Content length does not matter though it should be concise and clear.
+        - Format the content well with proper spacing and line breaks.
+        - Only output a single message/no multiple options.
+        - include  trending hashtags.
+        - add call to action to visit website https://ecogreencontractors.solutions/ and chat on whatsapp to number +254746887291.
 
 
 Topic: "{topic}"
@@ -281,7 +281,6 @@ def post_to_twitter(message):
     """
     Posts a message to Twitter using the Twitter API v2 and OAuth1Session.
     """
-    print("posting to twitter", message)
     print(f"Attempting to post to Twitter (X): {message}")
     print("posting to twitter a message with length", len(message))
     url = "https://api.twitter.com/2/tweets"
