@@ -3,8 +3,8 @@ kind: CronJob
 metadata:
   name: social-media-post
 spec:
-  # Runs at 05:00, 07:00, 13:00, 16:00, 21:00 every day (5 times per day)
-  schedule: "0 5,7,13,16,21 * * *"
+  # Runs at 05:00, 06:30, 07:00, 10:00, 13:00, 14:00, 16:00, 21:00 every day (8 times per day)
+  schedule: "0 5,6,7,10,13,14,16,21 * * *"
   jobTemplate:
     spec:
       template:
