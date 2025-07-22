@@ -54,11 +54,34 @@ def get_kenya_trends():
 def append_hashtags_to_message(message, hashtags):
     """
     Appends a list of hashtags to the message, separated by spaces.
+    Ensures each hashtag starts with #. If the final message is longer than 278 characters,
+    removes hashtags without # one by one until the message is <= 278 chars.
     """
-    hashtags_string = ""
+    hashtags_list = []
     if hashtags:
-        hashtags_string = " ".join(hashtags) if isinstance(hashtags, list) else hashtags
-    final_message = message + " " + hashtags_string.strip()
+        if isinstance(hashtags, list):
+            hashtags_list = [(h if h.strip().startswith('#') else f'#{h.strip()}') for h in hashtags if h.strip()]
+        else:
+            h = hashtags.strip()
+            hashtags_list = [h if h.startswith('#') else f'#{h}']
+    final_message = message + " " + " ".join(hashtags_list).strip()
+    # If too long, remove hashtags without # one by one
+    if len(final_message) > 278:
+        # Find indices of hashtags that originally did NOT have #
+        original_hashtags = hashtags if isinstance(hashtags, list) else [hashtags]
+        indices_to_remove = [i for i, h in enumerate(original_hashtags) if not h.strip().startswith('#')]
+        hashtags_copy = hashtags_list.copy()
+        for idx in indices_to_remove:
+            if idx < len(hashtags_copy):
+                hashtags_copy.pop(idx)
+                temp_message = message + " " + " ".join(hashtags_copy).strip()
+                if len(temp_message) <= 278:
+                    final_message = temp_message
+                    break
+        # If still too long, truncate hashtags until fits
+        while len(final_message) > 278 and hashtags_copy:
+            hashtags_copy.pop()
+            final_message = message + " " + " ".join(hashtags_copy).strip()
     return final_message
 
 def generate_twitter_ai_content(topic):
