@@ -14,14 +14,29 @@ import time # To add delays and avoid being blocked
 # --- Image Posting Logic ---
 # Load environment variables from .env before any os.getenv calls
 load_dotenv()
-# List of online image URLs with their associated topics
-IMAGE_URLS = [
-    {
-        "image_url": "https://ecogreencontractors.solutions/static/media/about1.1c4f9ffe16b2ddba4075.jpg",
-        "topic": "Outside garden with flowers and walk ways"
-    },
-    # Add more image dicts as needed
-]
+
+# --- Image URLs Fetch Logic ---
+# If IMAGE_URLS_URL is set in the environment, fetch the JSON from that URL.
+# Otherwise, use the default list.
+IMAGE_URLS_URL = os.getenv("IMAGE_URLS_URL", "https://raw.githubusercontent.com/Nduhiu17/marketing-snapshots/refs/heads/main/photos.json")
+IMAGE_URLS = []
+try:
+    response = requests.get(IMAGE_URLS_URL, timeout=10)
+    if response.status_code == 200:
+        IMAGE_URLS = response.json()
+        print(f"Fetched {len(IMAGE_URLS)} images from {IMAGE_URLS_URL}")
+    else:
+        print(f"Failed to fetch image URLs from {IMAGE_URLS_URL}, status code: {response.status_code}")
+except Exception as e:
+    print(f"Error fetching image URLs from {IMAGE_URLS_URL}: {e}")
+    # Fallback to default list if fetch fails
+    # IMAGE_URLS = [
+    #     {
+    #         "image_url": "https://ecogreencontractors.solutions/static/media/about1.1c4f9ffe16b2ddba4075.jpg",
+    #         "topic": "Outside garden with flowers and walk ways"
+    #     },
+    #     # Add more image dicts as needed
+    # ]
 
 # --- Configuration ---
 # Gemini API Key: Get this from Google AI Studio or Google Cloud Console.
@@ -500,18 +515,49 @@ def send_social_media_post():
         print(f"Image topic: {image_topic}")
         image_path = download_image(image_url, "temp_image.jpg")
     if use_image and image_path:
-        # Generate AI marketing message for image using the image's topic
-        fb_post_content = generate_facebook_ai_content(image_topic)
-        x_post_content = generate_twitter_ai_content(image_topic)
-        x_post_content_with_hashtags = append_hashtags_to_message(x_post_content, trending_hashtags)
-        # Facebook
-        facebook_success = post_image_to_facebook_page(image_path, fb_post_content)
-        print(f"Facebook image post success: {facebook_success}")
-        print("\nPosting to Twitter with image...")
-        print(f"Twitter post content: {x_post_content_with_hashtags}")
-        # Twitter
-        twitter_success = post_image_to_twitter(image_path, x_post_content_with_hashtags)
-        print(f"Twitter image post success: {twitter_success}")
+        # --- Image Validation ---
+        valid_image = True
+        # 1. Check file size (must be < 4MB)
+        try:
+            file_size = os.path.getsize(image_path)
+            if file_size > 4 * 1024 * 1024:
+                print(f"Image too large for Facebook upload: {file_size/1024/1024:.2f} MB. Skipping upload.")
+                valid_image = False
+        except Exception as e:
+            print(f"Could not check image file size: {e}")
+            valid_image = False
+        # 2. Check file extension/type
+        allowed_exts = [".jpg", ".jpeg", ".png", ".gif", ".tiff", ".heif", ".webp"]
+        ext = os.path.splitext(image_path)[1].lower()
+        if ext not in allowed_exts:
+            print(f"Image file type {ext} not allowed for Facebook upload. Skipping upload.")
+            valid_image = False
+        # 3. Try to verify image with Pillow if installed
+        try:
+            from PIL import Image
+            with Image.open(image_path) as img:
+                img.verify()
+            print("Image verified with Pillow.")
+        except ImportError:
+            print("Pillow not installed, skipping image verification.")
+        except Exception as e:
+            print(f"Image verification failed: {e}. Skipping upload.")
+            valid_image = False
+        if not valid_image:
+            print("Image did not pass validation. Facebook upload skipped.")
+        else:
+            # Generate AI marketing message for image using the image's topic
+            fb_post_content = generate_facebook_ai_content(image_topic)
+            x_post_content = generate_twitter_ai_content(image_topic)
+            x_post_content_with_hashtags = append_hashtags_to_message(x_post_content, trending_hashtags)
+            # Facebook
+            facebook_success = post_image_to_facebook_page(image_path, fb_post_content)
+            print(f"Facebook image post success: {facebook_success}")
+            print("\nPosting to Twitter with image...")
+            print(f"Twitter post content: {x_post_content_with_hashtags}")
+            # Twitter
+            twitter_success = post_image_to_twitter(image_path, x_post_content_with_hashtags)
+            print(f"Twitter image post success: {twitter_success}")
         # Clean up temp image
         try:
             os.remove(image_path)
